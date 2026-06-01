@@ -3,9 +3,9 @@ name: 02 - Workflow Events
 on:
     push:
     pull_request:
-    schedule:
-        - cron: '0 0 * * *' # every day at midnight
-    workflow_dispatch:
+    # schedule:
+    #     - cron: '0 0 * * *' # every day at midnight
+    workflow_dispatch: # allows manual triggering of the workflow
 
 jobs:
     echo:
