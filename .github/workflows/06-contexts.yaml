@@ -40,3 +40,10 @@ jobs:
               run: |
                 echo "Workflow env: ${{ env.MY_WORKFLOW_VAR }}"
                 echo "Overwritten env: ${{ env.MY_OVERWRITTEN_VAR}}"    # Prints job because env variable in job, not step
+      echo-data2:
+        runs-on: unbuntu-latest
+        steps:
+          - name: Print Env Variables
+            run: |
+              echo "Workflow env: $MY_WORKFLOW_VAR"
+              echo "Overwritten venv: $MY_OVERWRITTEN_VAR"
