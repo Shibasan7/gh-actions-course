@@ -1,5 +1,5 @@
 name: 06 - Contexts
-run-name: 06 - Contexts | DEBUG - ${{ inputs.debug}}    # Custom name for each run
+run-name: 06 - Contexts | DEBUG - ${{ inputs.debug }}    # Custom name for each run
 on: 
   push:
   workflow_dispatch:
@@ -46,5 +46,5 @@ jobs:
         - name: Print Env Variables
           run: |
             echo "Workflow env: $MY_WORKFLOW_VAR"
-            echo "Overwritten venv: $MY_OVERWRITTEN_VAR"
+            echo "Overwritten env: $MY_OVERWRITTEN_VAR"
 
