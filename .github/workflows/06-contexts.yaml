@@ -1,5 +1,5 @@
 name: 06 - Contexts
-run-name: 06 - Contexts | DEBUG - ${{ inputs.debug}}
+run-name: 06 - Contexts | DEBUG - ${{ inputs.debug}}    # Custom name for each run
 on: 
   push:
   workflow_dispatch:
@@ -7,9 +7,16 @@ on:
       debug:
         type: boolean
         default: false
+
+env:
+  MY_WORKFLOW_VAR: "workflow"
+  MY_OVERWRITTEN_VAR: "workflow"
 jobs:
     echo-data:
         runs-on: ubuntu-latest
+        env:
+          MY_JOB_VAR: "job"
+          MY_OVERWRITTEN_VAR: "job"
         steps:
             - name: Display information
               run: |
@@ -23,3 +30,13 @@ jobs:
             - name: Retrieve variable
               run: |
                 echo "Variable Value: ${{ vars.MY_VAR }}"
+            - name: Print Env Variables
+              env:
+                MY_OVERWRITTEN_VAR: "step"      
+              run: |
+                echo "Workflow env: ${{ env.MY_WORKFLOW_VAR }}"
+                echo "Overwritten env: ${{ env.MY_OVERWRITTEN_VAR}}"    # Prints step because env variable in step
+            - name: Print Env Variables - Step 2
+              run: |
+                echo "Workflow env: ${{ env.MY_WORKFLOW_VAR }}"
+                echo "Overwritten env: ${{ env.MY_OVERWRITTEN_VAR}}"    # Prints job because env variable in job, not step
