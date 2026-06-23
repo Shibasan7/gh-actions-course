@@ -5,16 +5,16 @@ jobs:
     echo1:
         runs-on: ubuntu-latest
         steps:
-            - name: Print PR title
-              run: echo "${{ github.event.pull_request.title }}"
-            - name: Print PR labels
-              run: |
-                cat << EOF
-                ${{ toJSON(github.event.pull_request.labels) }}
-                EOF
-            - name: Bug Step
-              if: ${{ !cancelled() && contains(github.event.pull_request.title, 'fix') }}
-              run: echo "I am a bug fix."
+            # - name: Print PR title
+            #   run: echo "${{ github.event.pull_request.title }}"
+            # - name: Print PR labels
+            #   run: |
+            #     cat << EOF
+            #     ${{ toJSON(github.event.pull_request.labels) }}
+            #     EOF
+            # - name: Bug Step
+            #   if: ${{ !cancelled() && contains(github.event.pull_request.title, 'fix') }}
+            #   run: echo "I am a bug fix."
             - name: I will execute
               if: ${{ success() }}
               run: echo "I will print if previous steps succeed."
@@ -23,7 +23,7 @@ jobs:
               run: echo "I will print if any previous step fails."
             - name: I will execute
               if: ${{ ! cancelled() }}
-              run: echo "I will always print, execpt when the workflow is cancelled"
+              run: echo "I will always print, except when the workflow is cancelled"
             - name: I will execute when canceled
               if: ${{ cancelled() }}
               run: echo "I will print if the workflow is canceled"
