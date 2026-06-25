@@ -7,7 +7,7 @@ on:
                 description: Skip deployment and only print build output
                 default: false
             target:
-                type: environment           # Fetch environment variables from GitHub repo
+                type: environment           # Fetch environment from GitHub repo
                 required: true
                 description: Which environment the workflow will target
             tag:
