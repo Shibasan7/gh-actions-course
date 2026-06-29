@@ -21,7 +21,7 @@ jobs:
     #     run:                  # Set default working directory for all run steps
     #     working-directory: .github/workflows/13-caching
     outputs:
-      deps-cache-key: ${{ steps.cahce-key.outputs.CACHE_KEY }}
+      deps-cache-key: ${{ steps.cache-key.outputs.CACHE_KEY }}
     steps:
       # 1. Check out code
       - name: Checkout code
@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: ${{ inputs.node-version }}
       - name: Download cache dependencies
-        id: cahce-key
+        id: cache-key
         run: |
           echo "CACHE_KEY=deps-node-modules-${{ hashFiles('.gihub/workflows/13-caching') }}" >> "$GITHUB_OUTPUT"
       - name: Download cached dependencies
@@ -40,13 +40,14 @@ jobs:
         id: cache
         with:
           path: .github/workflows/13-caching                  # This would be the full path directory to the node_modules folder
-          key: ${{ steps.cahce-key.outputs.CACHE_KEY }}       # This would be the package-lock.json file for the react app
+          key: ${{ steps.cache-key.outputs.CACHE_KEY }}       # This would be the package-lock.json file for the react app
       # 2. Install dependencies
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
-  build:
+  lint-test:
     runs-on: ubuntu-latest
+    needs: install-deps
     # defaults:                 # Set defaults at job level
     #     run:                  # Set default working directory for all run steps
     #         working-directory: .github/workflows/13-caching
@@ -64,7 +65,7 @@ jobs:
         id: cache
         with:
           path: .github/workflows/13-caching                                      # This would be the full path directory to the node_modules folder
-          key: deps-node-modules-${{ hashFiles('.gihub/workflows/13-caching')}}   # This would be the package-lock.json file for the react app
+          key: ${{ needs.install-deps.outputs.deps-cache-key }}   # This would be the package-lock.json file for the react app
       # 2. Install dependencies
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
@@ -72,8 +73,33 @@ jobs:
       # 3. Unit testing, building
       - name: Testing
         run: npm run test
+      - name: Linting
+        run: echo "Linting..."
+  build:
+    runs-on: ubuntu-latest
+    needs: install-deps
+    # defaults:                 # Set defaults at job level
+    #     run:                  # Set default working directory for all run steps
+    #         working-directory: .github/workflows/13-caching
+    steps:
+      # 1. Check out code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Download cached dependencies
+        uses: actions/cache@v3
+        if: ${{ inputs.use-cache }}
+        id: cache
+        with:
+          path: .github/workflows/13-caching                                      # This would be the full path directory to the node_modules folder
+          key: ${{ needs.install-deps.outputs.deps-cache-key }}   # This would be the package-lock.json file for the react app
+      # 2. Install dependencies
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      # 3. Building
       - name: Building
         run: npm run build
-      # 4. Deploy to a nonprod environment
-      - name: Deploy to nonprod
-        run: echo "Deploying to nonprod"
