@@ -6,28 +6,74 @@ on:
               description: Whether to execute cache step
               type: boolean
               default: true
+            node-version:
+                description: Node version
+                type: choice
+                options:
+                  - 18.x
+                  - 20.x
+                  - 21.x
+                default: 20.x
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        # defaults:
-        #     run:                  # Set default working directory for all run steps
-        #         working-directory: .github/workflows/13-caching
-        steps:
-            # 1. Check out code
-            - name: Checkout code
-              uses: actions/checkout@v4
-            - name: Setup Node
-              uses: actions/setup-node@v3
-              with:
-                node-version: '20.x'
-            # 2. Install dependencies
-            - name: Install dependencies
-              run: npm ci
-            # 3. Unit testing, building
-            - name: Testing
-              run: npm run test
-            - name: Building
-              run: npm run build
-            # 4. Deploy to a nonprod environment
-            - name: Deploy to nonprod
-              run: echo "Deploying to nonprod"
+  install-deps:
+    runs-on: unbuntu-latest
+    # defaults:                 # Set defaults at job level
+    #     run:                  # Set default working directory for all run steps
+    #     working-directory: .github/workflows/13-caching
+    outputs:
+      deps-cache-key: ${{ steps.cahce-key.outputs.CACHE_KEY }}
+    steps:
+      # 1. Check out code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Download cache dependencies
+        id: cahce-key
+        run: |
+          echo "CACHE_KEY=deps-node-modules-${{ hashFiles('.gihub/workflows/13-caching') }}" >> "$GITHUB_OUTPUT"
+      - name: Download cached dependencies
+        uses: actions/cache@v3
+        if: ${{ inputs.use-cache }}
+        id: cache
+        with:
+          path: .github/workflows/13-caching                  # This would be the full path directory to the node_modules folder
+          key: ${{ steps.cahce-key.outputs.CACHE_KEY }}       # This would be the package-lock.json file for the react app
+      # 2. Install dependencies
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+  build:
+    runs-on: ubuntu-latest
+    # defaults:                 # Set defaults at job level
+    #     run:                  # Set default working directory for all run steps
+    #         working-directory: .github/workflows/13-caching
+    steps:
+      # 1. Check out code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+      - name: Download cached dependencies
+        uses: actions/cache@v3
+        if: ${{ inputs.use-cache }}
+        id: cache
+        with:
+          path: .github/workflows/13-caching                                      # This would be the full path directory to the node_modules folder
+          key: deps-node-modules-${{ hashFiles('.gihub/workflows/13-caching')}}   # This would be the package-lock.json file for the react app
+      # 2. Install dependencies
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+      # 3. Unit testing, building
+      - name: Testing
+        run: npm run test
+      - name: Building
+        run: npm run build
+      # 4. Deploy to a nonprod environment
+      - name: Deploy to nonprod
+        run: echo "Deploying to nonprod"
