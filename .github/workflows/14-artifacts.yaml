@@ -1,0 +1,46 @@
+name: 14 - Artifacts
+on: 
+    workflow_dispatch:
+
+jobs:
+    test-build:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: GH-Actions-Course
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Setup Node
+              uses: actions/setup-node@v3
+              with:
+                  node-version: '20.x'
+            - name: Download cached dependencies
+              uses: actions/cache@v3
+              id: cache
+              with:
+                path: GH-Actions-Course/node_modules
+                key: deps-node-modules-${{ hashFiles('GH-Actions-Course/package-lock.json') }}
+            - name: Install dependencies
+              if: steps.cache.outputs.cache-hit != 'true'
+              run: npm ci
+            - name: Unit tests
+              run: npm run test
+            - name: Build code
+              run: npm run build
+            - name: Upload build files
+              uses: actions/upload-artifact@v4
+              with:
+                name: app
+                path: GH-Actions-Course/build
+    deploy:
+        runs-on: ubuntu-latest
+        needs: test-build
+        steps:
+            - name: Download build artifact
+              uses: actions/download-artifact@v4
+              with:
+                name: app                           # Must match name of upload artifact
+                path: build
+            - name: Show folder structure
+              run: ls -R
