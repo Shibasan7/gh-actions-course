@@ -17,8 +17,8 @@ on:
 jobs:
   install-deps:
     runs-on: unbuntu-latest
-    # defaults:                 # Set defaults at job level
-    #     run:                  # Set default working directory for all run steps
+    # defaults:                   # Set defaults at job level
+    #     run:                    # Set default working directory for all run steps
     #     working-directory: .github/workflows/13-caching
     outputs:
       deps-cache-key: ${{ steps.cache-key.outputs.CACHE_KEY }}
@@ -39,8 +39,8 @@ jobs:
         if: ${{ inputs.use-cache }}
         id: cache
         with:
-          path: .github/workflows/13-caching                  # This would be the full path directory to the node_modules folder
-          key: ${{ steps.cache-key.outputs.CACHE_KEY }}       # This would be the package-lock.json file for the react app
+          path: .github/workflows/13-caching                  # This would be the full path directory of nodes_module (files/folder) to cache
+          key: ${{ steps.cache-key.outputs.CACHE_KEY }}       # This would be the package-lock.json or similar file unique identifier for cached content
       # 2. Install dependencies
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
@@ -64,8 +64,10 @@ jobs:
         if: ${{ inputs.use-cache }}
         id: cache
         with:
-          path: .github/workflows/13-caching                                      # This would be the full path directory to the node_modules folder
+          path: .github/workflows/13-caching                      # This would be the full path directory to the node_modules folder
           key: ${{ needs.install-deps.outputs.deps-cache-key }}   # This would be the package-lock.json file for the react app
+          restore-keys: |
+            deps-node-modules-               # This is a prefix for the cache key to restore the cache if the exact key is not found
       # 2. Install dependencies
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
