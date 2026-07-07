@@ -5,16 +5,30 @@ jobs:
     backwards-compatibility:
         runs-on: ${{ matrix.os}}-${{ matrix.node-version }}
         strategy:
+            fail-fast: false                    # Set at strategy level; if one job fails, the rest will continue to run
             matrix:
                 node-version: [18.x, 20.x, 21.x]
                 os:
                     - ubuntu-latest             # Minutes x 1
                     - windows-latest            # Minutes x 2
                     # - macos-latest            # Minutes x 10
+                include:                        # Applies only to specified options
+                    - os: ubuntu-latest
+                      node-version: 16.x
+                    - os: ubuntu-latest
+                      node-version: 21.x
+                      tag: experimental
         steps:
             - name: Setup node
               uses: actions/setup-node@v3
               with:
                 node-version: ${{ matrix.node-version }}
+            - name: Fail if experimental
+              if: matrix.tag == 'experimental'
+              run: exit 1
             - name: Perform tests
-              run: echo "Running tests on OS ${{ matrix.os }} and NodeJS ${{ matrix.node-version }}"
+              run: |
+                echo "Running tests on OS ${{ matrix.os }} and NodeJS ${{ matrix.node-version }}"
+                sleep 10
+            - name: Upload test results
+              run: echo "Uploading test results"
