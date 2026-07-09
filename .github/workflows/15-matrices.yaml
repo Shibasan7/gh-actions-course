@@ -23,9 +23,6 @@ jobs:
               uses: actions/setup-node@v3
               with:
                 node-version: ${{ matrix.node-version }}
-            - name: Fail if experimental
-              if: matrix.tag == 'experimental'
-              run: exit 1
             - name: Perform tests
               run: |
                 echo "Running tests on OS ${{ matrix.os }} and NodeJS ${{ matrix.node-version }}"
@@ -33,16 +30,27 @@ jobs:
             - name: Upload test results
               run: echo "Uploading test results"
     include-example:
-      name: ${{ matrix.color }}-${{ matrix.shape }}-${{ matrix.size }}
+      name: ${{ matrix.color }}-${{ matrix.shape }}-${{ matrix.size }}-${{ matrix.opacity }}
       runs-on: ubuntu-latest
       strategy:
         matrix:
           color: [red, green]
           shape: [cirlce, square]
           size: [small, large]
-          include:
-            - color: red
+          include:                        # Precedence depends on order; latest entry in array overrides previous ones
+            - opacity: 50                 # Added to every entry of matrix; can be added to original values without overriding them
+            - color: red                  # Everything with red has opacity of 75
+              opacity: 75
+            - shape: circle               # Everything with circle has opacity of 100
+              opacity: 100
+            - color: red                  # Adds entry to matrix at run; cannot be added to orginal values without overriding them
               shape: triangle
+            - color: green
+              shape: circle
+              size: medium
+          exclude:                        # Processed before include block
+            - color: green                # Partial matches are valid
+              shape: circle
       steps:
         - name: Dummy step
-          run: echo "${{ matrix.color }}-${{ matrix.shape }}-${{ matrix.size }}"
+          run: echo "${{ matrix.color }}-${{ matrix.shape }}-${{ matrix.size }}-${{ matrix.opacity }}"
