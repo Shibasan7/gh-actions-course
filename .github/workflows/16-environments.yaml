@@ -19,7 +19,7 @@ jobs:
               run: echo "Running E2e"
     deploy-prod:
         runs-on: ubuntu-latest
-        nees: e2e-tests
+        needs: e2e-tests
         environment: prod
         # env:
         #     my-env-value: ${{ vars.MY_ENV_VALUE || 'default value'}}
