@@ -1,0 +1,21 @@
+name: 17 - Custom Actions - Composite
+on:
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        defaults:
+            run:
+                working-directory: .github/workflows/17-1-custom-actions-composite
+        steps:
+            - uses: actions/checkout@v4
+            - name: Setup Node and NPM Dependencies
+              uses: ./.github/workflows/actions/composite-cache-deps
+              with:
+                node-version: 20.x
+                working-dir: .github/workflows/17-1-custom-actions-composite        # Still need to define working direcotry for custom action
+            - name: Test
+              run: npm run test
+            - name: Build
+              run: npm run build
