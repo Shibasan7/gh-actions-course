@@ -26,4 +26,6 @@ runs:
           if: steps.cache.outputs.cache-hit != 'true'
           run: npm ci
           shell: bash           # Must provide shell for composite actions to run commands
-          working-directory: ${{ inputs.working-dir }}
+          working-directory: ${{ inputs.working-dir }}      # Must provide working directory for composite actions to run commands
+                                                            # If app is not at root, must provide working directory
+    
