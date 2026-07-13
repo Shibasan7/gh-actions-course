@@ -19,11 +19,10 @@ jobs:
     runs-on: unbuntu-latest
     # defaults:                   # Set defaults at job level
     #     run:                    # Set default working directory for all run steps
-    #     working-directory: .github/workflows/13-caching
+    #       working-directory: .github/workflows/13-caching
     outputs:
       deps-cache-key: ${{ steps.cache-key.outputs.CACHE_KEY }}
     steps:
-      # 1. Check out code
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Setup Node
