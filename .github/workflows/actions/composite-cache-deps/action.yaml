@@ -9,6 +9,10 @@ inputs:
         description: The working directory of the application
         default: .
         required: false
+    target-dev:
+        description: '"dev" or "prod". Controls whether dev dependencies are installed'
+        default: .
+        required: false
 runs:
     using: composite            # Defines composite action
     steps:
@@ -24,8 +28,7 @@ runs:
             key: node-modules-${{ hashFiles(format('{0}/{1}', inputs.working-dir, 'package-lock.json')) }}
         - name: Install dependencies
           if: steps.cache.outputs.cache-hit != 'true'
-          run: npm ci
+          run: ${{ inputs.target-dev == 'dev' && 'npm ci' || 'npm ci --omit=dev' }}
           shell: bash           # Must provide shell for composite actions to run commands
           working-directory: ${{ inputs.working-dir }}      # Must provide working directory for composite actions to run commands
                                                             # If app is not at root, must provide working directory
-    
