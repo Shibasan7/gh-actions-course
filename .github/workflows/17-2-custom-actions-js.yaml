@@ -9,4 +9,4 @@ jobs:
         steps:
             - uses: actions/checkout@v4
             - name: Check for dependency updates
-              uses: ./.github/workflows/actions/js-dpendency-update
+              uses: ./.github/actions/js-dpendency-update
