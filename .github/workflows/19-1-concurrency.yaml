@@ -12,8 +12,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Ping URL
         id: ping-url
-        uses: ./.github/actions/docker-ping-url
-        with:
-          url: https://www.google.com
-          max_trials: 20
-          delay: 5
+        run: ping https://google.com -c 20 -i 5
+        # with:
+        #   url: https://www.google.com
+        #   max_trials: 20
+        #   delay: 5
