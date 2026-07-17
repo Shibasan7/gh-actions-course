@@ -1,4 +1,4 @@
-name: 19 - 1 - Managing Concurrency
+name: 19 - 2 - Managing Concurrency
 on:
   workflow_dispatch:
     inputs:
@@ -18,11 +18,17 @@ on:
         default: 5
         type: number
 
-concurrency:          # Good practice to use different group names for each work flow to avoid possible canceling jobs in other workflows
-  group: ${{ github.workflow }}-${{ github.ref }}   # Current workflow and branch names
-
 jobs:
   ping:
+    runs-on: ubuntu-latest
+    concurrency:                # At the job level, if workflow is run multiple times, follow-on jobs will wait for this one to finish
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Ping URL
+        id: ping-url
+        run: ping -c ${{ inputs.max_trails}} -i ${{ inputs.delay }} ${{ inputs.ip_address }}
+  ping-without-concurrency:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
