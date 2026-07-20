@@ -7,7 +7,7 @@ on:
         required: true
         default: 8.8.8.8
         type: string
-      max_trails:
+      max_trials:
         description: 'Max number of pings'
         required: true
         default: 20
@@ -28,4 +28,4 @@ jobs:
       - uses: actions/checkout@v7
       - name: Ping URL
         id: ping-url
-        run: ping -c ${{ inputs.max_trails}} -i ${{ inputs.delay }} ${{ inputs.ip_address }}
+        run: ping -c ${{ inputs.max_trials}} -i ${{ inputs.delay }} ${{ inputs.ip_address }}
